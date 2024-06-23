@@ -1,10 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import config from "./config/config.js";
-import bodyParser from "body-parser";
 import router from "./routes/routes.js";
 
 const app = express();
+app.use(express.json());
+
 const port = 4000;
 
 const { user, password } = config;
@@ -24,11 +25,17 @@ database.once("open", () => {
   console.log("Database Connected successfully ✅");
 });
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
 app.listen(port, () => {
   console.log("Server is listening on port 4000");
 });
 
 app.use("/", router);
+
+//while error in catch block
+app.use((error, req, res, next) => {
+  res.status(500).send({
+    data: null,
+    message: error.message,
+    success: false,
+  });
+});
